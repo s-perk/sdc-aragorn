@@ -2,11 +2,13 @@ import React from 'react'
 import { useLayoutEffect, useState } from 'react'
 import OldFaithfulLastEruption from './OldFaithfulLastEruption.jsx'
 
-export default function RightSide ({ handleSearch, cartLength }) {
+export default function RightSide ({ handleSearch, cartLength, product }) {
 
   return (
     <div className="flex gap-2">
-      <OldFaithfulLastEruption />
+      <h3 className='italic pr-2 justify-self-end text-red-900 font-semibold'>
+        Product ID: {product.id}
+      </h3>
       <div className="flex-1 justify-self-end form-control">
         <input type="text" placeholder="Search" className="input input-bordered" onKeyDown={handleSearch} />
       </div>
