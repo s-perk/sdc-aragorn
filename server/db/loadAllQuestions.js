@@ -4,12 +4,12 @@ const Promise = require('bluebird')
 const {Client} = require('pg')
 let query = ``
 
-const limit = 1000
-const chunk = 100
+const limit = 1000000
+const chunk = 10000
 
 // Note: we use the crlfDelay option to recognize all instances of CR LF
 // ('\r\n') in input.txt as a single line break.
-const fileStream = fs.createReadStream('questions.csv');
+const fileStream = fs.createReadStream('../extracts/questions.csv');
 const rl = readline.createInterface({
   input: fileStream,
   crlfDelay: Infinity
@@ -45,7 +45,7 @@ async function processLineByLine() {
   }
 
 
-  return true;
+  console.log(`total of ${count} rows loaded`)
 
 }
 
