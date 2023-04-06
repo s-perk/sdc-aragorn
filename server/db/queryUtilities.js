@@ -62,4 +62,94 @@ const translateQuestion = (line) => {
   return queryLine
 }
 
+const translateAnswer = (line) => {
+
+  // Split into array to grab values
+  let array = line.split(',')
+
+  // If we have errant commas, do some extra processing
+  // without this, we will mess up number of columns
+  // I'm not performing this on everything to try and speed things up
+  if (array.length !== 8) {
+    array = csvToArray(line)
+  }
+
+
+  // body
+  let body = array[2]
+  body = body.replaceAll("'", "\'")
+  array[2] = body
+
+
+  // Instant
+  let instant = array[3]
+  instant = new Date(+instant).toString()
+  // if invalid date, just set equal to epoch
+  if (instant === 'Invalid Date') {
+    instant = 'Thu Jan 01 1970 00:00:00-240'
+  }
+  instant = instant.split(' GMT-')[0]
+  instant = instant + '-240'
+
+  array[3] = `"${instant}"`
+
+
+  // Reported?
+  let reported = array[6]
+  if (reported === 1) {
+    reported = 'true'
+  } else {
+    reported = 'false'
+  }
+
+  array[6] = reported
+
+  // Paste it all back together
+  // Query parameters
+  let queryLine = `INSERT INTO answers (id, question_id, answer_body, instant, answerer_name, answerer_email, reported, helpful) VALUES (${array.join(',')});
+  `
+
+  // replace all single quotes with double-singles
+  queryLine = queryLine.replaceAll("'", "''")
+
+  // replace all double quotes with single quotes
+  queryLine = queryLine.replaceAll('"', "'",)
+
+  return queryLine
+}
+
+const translateAnswerPhotos = (line) => {
+
+
+  // Split into array to grab values
+  let array = line.split(',')
+
+  // If we have errant commas, do some extra processing
+  // without this, we will mess up number of columns
+  // I'm not performing this on everything to try and speed things up
+  if (array.length !== 3) {
+    array = csvToArray(line)
+  }
+
+  /*
+  id BIGSERIAL NOT NULL PRIMARY KEY,
+  answer_id bigint NOT NULL,
+  "url" varchar(1000) NOT NULL,
+  */
+  // Paste it all back together
+  // Query parameters
+  let queryLine = `INSERT INTO answer_photos (id, answer_id, url) VALUES (${array.join(',')});
+  `
+
+  // replace all single quotes with double-singles
+  queryLine = queryLine.replaceAll("'", "''")
+
+  // replace all double quotes with single quotes
+  queryLine = queryLine.replaceAll('"', "'",)
+
+  return queryLine
+}
+
 module.exports.translateQuestion = translateQuestion
+module.exports.translateAnswer = translateAnswer
+module.exports.translateAnswerPhotos = translateAnswerPhotos
