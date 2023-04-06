@@ -4,7 +4,7 @@ const router = Router()
 const axios = require('axios')
 const dotenv = require('dotenv')
 const { ConcatenationScope } = require('webpack')
-const controller = require('../controllers')
+const controller = require('../controllers/postgres')
 
 // Heroku API info
 const HEROKU_API_END_POINT = 'https://app-hrsei-api.herokuapp.com/api/fec2/hr-rfe'

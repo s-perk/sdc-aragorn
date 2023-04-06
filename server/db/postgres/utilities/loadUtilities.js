@@ -2,7 +2,7 @@ const fs = require('fs');
 const readline = require('readline');
 const { once } = require('node:events');
 const Promise = require('bluebird')
-const client = require('./connection.js').client
+const client = require('../connection.js').client
 
 let query = ``
 let count = 0

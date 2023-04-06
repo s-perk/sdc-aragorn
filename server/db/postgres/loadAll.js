@@ -1,5 +1,5 @@
-const loadRecords = require('./loadUtilities.js').loadRecords
-const queryUtilities = require('./queryUtilities.js')
+const loadRecords = require('./utilities/loadUtilities.js').loadRecords
+const queryUtilities = require('./utilities/queryUtilities.js')
 
 async function loadAll () {
   // Questions
