@@ -46,16 +46,16 @@ router.all('*', (req, res, next) => {
 
 
 // // ----- PRODUCTS / ID -----
-// router.get('/products/:product_id', (req, res) => {
+router.get('/products/:product_id', (req, res) => {
 
-//   axios.get(`${HEROKU_API_END_POINT}/products/${req.params.product_id}`, req.options)
-//     .then ((result) => {
-//       res.send(result.data)
-//     })
-//     .catch((err) => {
-//       console.log(err)
-//     })
-// })
+  axios.get(`${HEROKU_API_END_POINT}/products/${req.params.product_id}`, req.options)
+    .then ((result) => {
+      res.send(result.data)
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+})
 
 
 
@@ -67,21 +67,9 @@ router.all('*', (req, res, next) => {
 router.get('/qa/questions', controller.questions.get)
 
 
+
 // ----- Answers -----
-router.get('/qa/questions/:question_id/answers', (req, res) => {
-
-  if (req.params.question_id === undefined) {
-    res.status(404).send('Must provide a "question_id" parameter')
-  }
-
-  axios.get(`${HEROKU_API_END_POINT}/qa/questions/${req.params.question_id}/answers`, req.options)
-    .then ((result) => {
-      res.send(result.data)
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-})
+router.get('/qa/questions/:question_id/answers', controller.answers.get)
 
 // =====================================
 //                POST
