@@ -4,6 +4,7 @@ const router = Router()
 const axios = require('axios')
 const dotenv = require('dotenv')
 const { ConcatenationScope } = require('webpack')
+const controller = require('../controllers/postgres')
 
 // Heroku API info
 const HEROKU_API_END_POINT = 'https://app-hrsei-api.herokuapp.com/api/fec2/hr-rfe'
@@ -44,7 +45,7 @@ router.all('*', (req, res, next) => {
 // -------------------------------------
 
 
-// ----- PRODUCTS / ID -----
+// // ----- PRODUCTS / ID -----
 router.get('/products/:product_id', (req, res) => {
 
   axios.get(`${HEROKU_API_END_POINT}/products/${req.params.product_id}`, req.options)
@@ -63,37 +64,12 @@ router.get('/products/:product_id', (req, res) => {
 // -------------------------------------
 
 // ----- Questions -----
-router.get('/qa/questions', (req, res) => {
+router.get('/qa/questions', controller.questions.get)
 
-  if (req.options.params.product_id === undefined) {
-    res.status(404).send('Must provide a "product_id" parameter')
-  }
-
-  axios.get(`${HEROKU_API_END_POINT}/qa/questions`, req.options)
-    .then ((result) => {
-      res.send(result.data)
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-})
 
 
 // ----- Answers -----
-router.get('/qa/questions/:question_id/answers', (req, res) => {
-
-  if (req.params.question_id === undefined) {
-    res.status(404).send('Must provide a "question_id" parameter')
-  }
-
-  axios.get(`${HEROKU_API_END_POINT}/qa/questions/${req.params.question_id}/answers`, req.options)
-    .then ((result) => {
-      res.send(result.data)
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-})
+router.get('/qa/questions/:question_id/answers', controller.answers.get)
 
 // =====================================
 //                POST
