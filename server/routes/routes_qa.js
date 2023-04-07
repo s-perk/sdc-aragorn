@@ -81,22 +81,7 @@ router.get('/qa/questions/:question_id/answers', controller.answers.get)
 // -------------------------------------
 
 // ----- Questions -----
-router.post('/qa/questions', (req, res) => {
-  if (req.body.product_id === undefined) {
-    res.status(404).send('Must provide a "product_id" parameter')
-  }
-
-  console.log('POST QUESTION!', req.body)
-  controller.questions.post(req, res)
-
-  // axios.post(`${HEROKU_API_END_POINT}/qa/questions`, req.body, req.options)
-  //   .then(response => {
-  //     res.status(201).send('Successfully posted question to Atelier API');
-  //   })
-  //   .catch(err => {
-  //     res.status(404).send('Error connecting to Atelier Questions API');
-  //   })
-})
+router.post('/qa/questions', controller.questions.post)
 
 
 
@@ -106,13 +91,15 @@ router.post('/qa/questions/:question_id/answers', (req, res) => {
     res.status(404).send('Must provide a "question_id" path parameter')
   }
 
-  axios.post(`${HEROKU_API_END_POINT}/qa/questions/${req.params.question_id}/answers`, req.body, req.options)
-    .then(response => {
-      res.status(201).send('Successfully posted answer to Atelier API');
-    })
-    .catch(err => {
-      res.status(404).send('Error connecting to Atelier Questions API');
-    })
+  controller.answers.post(req, res)
+
+  // axios.post(`${HEROKU_API_END_POINT}/qa/questions/${req.params.question_id}/answers`, req.body, req.options)
+  //   .then(response => {
+  //     res.status(201).send('Successfully posted answer to Atelier API');
+  //   })
+  //   .catch(err => {
+  //     res.status(404).send('Error connecting to Atelier Questions API');
+  //   })
 })
 
 // =====================================

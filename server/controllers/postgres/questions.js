@@ -1,5 +1,4 @@
 const client = require('../../db/postgres/connection.js').client
-const controller = require('./index.js')
 const instantToString = require('../../db/postgres/utilities/queryUtilities.js').instantToString
 
 module.exports = {
@@ -100,26 +99,24 @@ module.exports = {
 
 
   post: function (req, res) {
-    var params = [req.body.message, req.body.username, req.body.roomname];
+    if (req.body.product_id === undefined) {
+      res.status(404).send('Must provide a "product_id" parameter')
+    }
+
+    let body = req.body.body
+    body = body.replace("'", "''")
 
     let instant = instantToString(Date.now())
 
 
     let queryStr = `INSERT INTO questions (product_id, question_body, instant, asker_name, asker_email, reported, helpful)
-      VALUES (${req.body.product_id},'${req.body.body}','${instant}','${req.body.name}','${req.body.email}',false,0);
+      VALUES (${req.body.product_id},'${body}','${instant}','${req.body.name}','${req.body.email}',false,0);
     `
-    console.log(queryStr)
     client.query(queryStr)
       .then((data) => {
         res.status(201).send('Status: 201 CREATED')
       }
     )
-    // models.questions.create(params, function(err, results) {
-    //   if (err) {
-    //     console.error('Unable to post questions to the database: ', err);
-    //     res.sendStatus(500);
-    //   }
-    //   res.sendStatus(201);
-    // });
+
   }
   };
