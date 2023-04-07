@@ -70,7 +70,7 @@ const loadRecords = (filePath, translateFunc, limit, chunk, start) => {
       count++
     }
 
-    await once(rl, 'close');
+    // await once(rl, 'close');
 
     console.log(`after process: total of ${count} rows loaded`)
 
