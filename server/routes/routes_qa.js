@@ -86,21 +86,8 @@ router.post('/qa/questions', controller.questions.post)
 
 
 // ----- Answers -----
-router.post('/qa/questions/:question_id/answers', (req, res) => {
-  if (req.params.question_id === undefined) {
-    res.status(404).send('Must provide a "question_id" path parameter')
-  }
+router.post('/qa/questions/:question_id/answers', controller.answers.post)
 
-  controller.answers.post(req, res)
-
-  // axios.post(`${HEROKU_API_END_POINT}/qa/questions/${req.params.question_id}/answers`, req.body, req.options)
-  //   .then(response => {
-  //     res.status(201).send('Successfully posted answer to Atelier API');
-  //   })
-  //   .catch(err => {
-  //     res.status(404).send('Error connecting to Atelier Questions API');
-  //   })
-})
 
 // =====================================
 //                PUT
@@ -112,63 +99,19 @@ router.post('/qa/questions/:question_id/answers', (req, res) => {
 // -------------------------------------
 
 // ----- Mark Question as Helpful -----
-router.put('/qa/questions/:question_id/helpful', (req, res) => {
-  if (req.params.question_id === undefined) {
-    res.status(404).send('Must provide a "question_id" path parameter')
-  }
+router.put('/qa/questions/:question_id/helpful', controller.questions.helpful)
 
-  axios.put(`${HEROKU_API_END_POINT}/qa/questions/${req.params.question_id}/helpful`, {}, req.options)
-    .then(response => {
-      res.status(201).send('Successfully marked question as helpful to Atelier API');
-    })
-    .catch(err => {
-      res.status(404).send('Error connecting to Atelier Questions API');
-    })
-})
 // ----- Report Question -----
-router.put('/qa/questions/:question_id/report', (req, res) => {
-  if (req.params.question_id === undefined) {
-    res.status(404).send('Must provide a "question_id" path parameter')
-  }
+router.put('/qa/questions/:question_id/report', controller.questions.report)
 
-  axios.put(`${HEROKU_API_END_POINT}/qa/questions/${req.params.question_id}/report`, {}, req.options)
-    .then(response => {
-      res.status(201).send('Successfully reported question to Atelier API');
-    })
-    .catch(err => {
-      console.log(err)
-      res.status(404).send('Error connecting to Atelier Reviews API');
-    })
-})
+
+
+
 // ----- Mark Answer as Helpful -----
-router.put('/qa/answers/:answer_id/helpful', (req, res) => {
-  if (req.params.answer_id === undefined) {
-    res.status(404).send('Must provide an "answer_id" path parameter')
-  }
+router.put('/qa/answers/:answer_id/helpful', controller.answers.helpful)
 
-  axios.put(`${HEROKU_API_END_POINT}/qa/answers/${req.params.answer_id}/helpful`, {}, req.options)
-    .then(response => {
-      res.status(201).send('Successfully marked answer as helpful to Atelier API');
-    })
-    .catch(err => {
-      res.status(404).send('Error connecting to Atelier Questions API');
-    })
-})
 // ----- Report Answer -----
-router.put('/qa/answers/:answer_id/report', (req, res) => {
-  if (req.params.answer_id === undefined) {
-    res.status(404).send('Must provide an "answer_id" path parameter')
-  }
-
-  axios.put(`${HEROKU_API_END_POINT}/qa/answers/${req.params.answer_id}/report`, {}, req.options)
-    .then(response => {
-      res.status(201).send('Successfully reported answer to Atelier API');
-    })
-    .catch(err => {
-      console.log(err)
-      res.status(404).send('Error connecting to Atelier Reviews API');
-    })
-})
+router.put('/qa/answers/:answer_id/report', controller.answers.report)
 
 
 

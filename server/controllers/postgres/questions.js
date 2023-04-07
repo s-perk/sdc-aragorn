@@ -118,5 +118,46 @@ module.exports = {
       }
     )
 
+  },
+
+  helpful: function (req, res) {
+
+    if (req.params.question_id === undefined) {
+      res.status(404).send('Must provide a "question_id" parameter')
+    }
+
+    let queryStr =
+    `UPDATE questions SET helpful = helpful+1 WHERE id = ${req.params.question_id};
+    `
+
+
+    client.query(queryStr)
+      .then((data) => {
+        res.status(201).send('Status: 201 UPDATED')
+      })
+      .catch((err) => {
+        console.log('helpful save error!')
+      })
+
+  },
+
+  report: function (req, res) {
+
+    if (req.params.question_id === undefined) {
+      res.status(404).send('Must provide a "question_id" parameter')
+    }
+
+    let queryStr =
+    `UPDATE questions SET reported = true WHERE id = ${req.params.question_id};
+    `
+
+    client.query(queryStr)
+      .then((data) => {
+        res.status(201).send('Status: 201 UPDATED')
+      })
+      .catch((err) => {
+        console.log('reported save error!')
+      })
+
   }
-  };
+};

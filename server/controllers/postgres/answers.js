@@ -85,8 +85,6 @@ module.exports = {
       res.status(404).send('Must provide a "question_id" parameter')
     }
 
-    console.log(req.body)
-
     let body = req.body.body
     body = body.replace("'", "''")
 
@@ -99,10 +97,6 @@ module.exports = {
     RETURNING id;
     `
 
-
-
-    console.log(queryStrAnswers)
-
     client.query(queryStrAnswers)
       .then((data, err) => {
         let answer_id = data.rows[0].id
@@ -111,8 +105,6 @@ module.exports = {
           queryStrAnswerPhotos += `INSERT INTO answer_photos (answer_id, url) VALUES (${answer_id}, '${url}');`
 
         })
-        console.log(queryStrAnswerPhotos)
-
 
         // then run query  on photos
         client.query(queryStrAnswerPhotos)
@@ -121,13 +113,48 @@ module.exports = {
           })
       })
 
-    // var params = [req.body.message, req.body.username, req.body.roomname];
-    // models.questions.create(params, function(err, results) {
-    //   if (err) {
-    //     console.error('Unable to post questions to the database: ', err);
-    //     res.sendStatus(500);
-    //   }
-    //   res.sendStatus(201);
-    // });
+  },
+
+
+  helpful: function (req, res) {
+
+    if (req.params.answer_id === undefined) {
+      res.status(404).send('Must provide a "answer_id" parameter')
+    }
+
+    let queryStr =
+    `UPDATE answers SET helpful = helpful+1 WHERE id = ${req.params.answer_id};
+    `
+
+
+    client.query(queryStr)
+      .then((data) => {
+        res.status(201).send('Status: 201 UPDATED')
+      })
+      .catch((err) => {
+        console.log('helpful save error!')
+      })
+
+  },
+
+  report: function (req, res) {
+
+    if (req.params.answer_id === undefined) {
+      res.status(404).send('Must provide a "answer_id" parameter')
+    }
+
+    let queryStr =
+    `UPDATE answers SET reported = true WHERE id = ${req.params.answer_id};
+    `
+
+
+    client.query(queryStr)
+      .then((data) => {
+        res.status(201).send('Status: 201 UPDATED')
+      })
+      .catch((err) => {
+        console.log('helpful save error!')
+      })
+
   }
-  };
+};
