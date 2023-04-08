@@ -92,8 +92,6 @@ module.exports = {
           prevQid = row.question_id
           prevAid = row.answer_id
 
-
-
         }
 
         return payload
