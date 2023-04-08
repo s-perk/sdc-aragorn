@@ -4,7 +4,10 @@ const instantToString = require('../../db/postgres/utilities/queryUtilities.js')
 module.exports = {
 
   get: function (req, res) {
+    console.log(req.options.params)
     let product_id = req.options.params.product_id
+    let page = req.options.params.page || '1'
+    let count = req.options.params.count || '5'
 
     if (product_id === undefined) {
       res.status(404).send('Must provide a "product_id" parameter')
@@ -19,9 +22,6 @@ module.exports = {
       left outer join answer_photos on(answers.id = answer_photos.answer_id)\
       where questions.product_id=${product_id} \
       `
-      // `select * from questions\
-      // where questions.product_id=${product_id}`
-
 
     client.query(queryStr)
       .then((data) => {
@@ -31,17 +31,21 @@ module.exports = {
         payload.results = []
 
         let obj = {}
+        let questionCnt = 0
         let prevQid
         let prevAid
 
         // Loop through each row and parse into expected format
         // Each row = 1 question + answer + url
+
         for (var i = 0; i < data.rows.length; i++) {
           let row = data.rows[i]
 
+          if (questionCnt > count) {break;}
 
           // if a new question, then save old object and prime a new one
           if (row.question_id !== prevQid) {
+
             if (i > 0) {
               payload.results.push(obj)
             }
@@ -56,7 +60,10 @@ module.exports = {
               reported: row.reported,
               answers: {}
             }
+
+            questionCnt++
           }
+
 
           if (row.answer_id !== null) {
 
@@ -77,16 +84,16 @@ module.exports = {
 
           }
 
-          // handle if only one result
-          if (data.rows.length === 1) {
+          // handle if only one result or last result
+          if ((data.rows.length === 1) || (i === data.rows.length - 1)) {
             payload.results.push(obj)
           }
 
           prevQid = row.question_id
           prevAid = row.answer_id
 
-
         }
+
         return payload
 
       // client.end()

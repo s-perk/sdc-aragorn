@@ -5,7 +5,11 @@ module.exports = {
 
   get: function (req, res) {
 
+    console.log(req.options.params)
+
     let question_id = req.params.question_id
+    let page = req.options.params.page || 1
+    let count = req.options.params.count || 5
 
     if (question_id === undefined) {
       res.status(404).send('Must provide a "question_id" parameter')
@@ -17,66 +21,71 @@ module.exports = {
       answer_photos.id as "photo_id", answer_photos.url\
       from answers\
       left outer join answer_photos on(answers.id = answer_photos.answer_id)\
-      where question_id=${question_id} \
+      where question_id=${question_id}
       `// order by instant desc';
 
     client.query(queryStr)
-    .then((data) => {
-      let payload = {}
+      .then((data) => {
+        let payload = {}
 
-      payload.question = question_id
-      payload.page = req.params.page || 1
-      payload.count = req.params.count || 5
-      payload.results = []
+        payload.question = question_id
+        payload.page = page
+        payload.count = count
+        payload.results = []
 
-      let obj = {}
-      let prevAid
-      // Loop through each row and parse into expected format
-      // Each row = 1 question + answer + url
-      for (var i = 0; i < data.rows.length; i++) {
-        let row = data.rows[i]
+        let obj = {}
+        let prevAid
+        let answerCnt = 0
 
-        // Process Answers
-        if (row.id !== prevAid) {
-          if (i > 0) {
+        // Loop through each row and parse into expected format
+        // Each row = 1 answer + url
+        for (var i = 0; i < data.rows.length; i++) {
+
+          if (answerCnt > count) {break;}
+
+          let row = data.rows[i]
+
+          // Process Answers
+          if (row.id !== prevAid) {
+            if (i > 0) {
+              payload.results.push(obj)
+            }
+            obj = {
+              "answer_id": +row.id,
+              "body": row.answer_body,
+              "date": row.instant,
+              "answerer_name": row.answerer_name,
+              "answerer_email": row.answerer_name,
+              "helpfulness": row.helpful,
+              "photos": []
+            }
+            answerCnt++
+          }
+
+          // Process Photos
+          if (row.url !== null) {
+            obj.photos.push(
+              {
+                id: row.photo_id,
+                url: row.url
+              }
+            )
+          }
+
+          // handle if only one result
+          if ((data.rows.length === 1) || (i === data.rows.length - 1)) {
             payload.results.push(obj)
           }
-          obj = {
-            "answer_id": +row.id,
-            "body": row.answer_body,
-            "date": row.instant,
-            "answerer_name": row.answerer_name,
-            "answerer_email": row.answerer_name,
-            "helpfulness": row.helpful,
-            "photos": []
-          }
 
+          prevAid = row.answer_id
+          prevPid = row.photo_id
         }
-
-        // Process Photos
-        if (row.url !== null) {
-          obj.photos.push(
-            {
-              id: row.photo_id,
-              url: row.url
-            }
-          )
-        }
-
-        // handle if only one result
-        if (data.rows.length === 1) {
-          payload.results.push(obj)
-        }
-
-        prevAid = row.answer_id
-        prevPid = row.photo_id
-      }
-      return payload
-    }).then((payload) => {
-      res.send(payload)
-    }).catch ((err) => {
-      console.log('error', err)
-    })
+        return payload
+      }).then((payload) => {
+        res.send(payload)
+      }).catch ((err) => {
+        console.log('error', err)
+      })
   },
 
 
