@@ -1,4 +1,5 @@
 const client = require('../../db/postgres/connection.js').client
+const instantToString = require('../../db/postgres/utilities/queryUtilities.js').instantToString
 
 module.exports = {
 
@@ -53,12 +54,14 @@ module.exports = {
         }
 
         // Process Photos
-        obj.photos.push(
-          {
-            id: row.photo_id,
-            url: row.url
-          }
-        )
+        if (row.url !== null) {
+          obj.photos.push(
+            {
+              id: row.photo_id,
+              url: row.url
+            }
+          )
+        }
 
         // handle if only one result
         if (data.rows.length === 1) {
@@ -78,13 +81,80 @@ module.exports = {
 
 
   post: function (req, res) {
-    var params = [req.body.message, req.body.username, req.body.roomname];
-    models.questions.create(params, function(err, results) {
-      if (err) {
-        console.error('Unable to post questions to the database: ', err);
-        res.sendStatus(500);
-      }
-      res.sendStatus(201);
-    });
+    if (req.params.question_id === undefined) {
+      res.status(404).send('Must provide a "question_id" parameter')
+    }
+
+    let body = req.body.body
+    body = body.replace("'", "''")
+
+    let instant = instantToString(Date.now())
+
+
+    let queryStrAnswers =
+    `INSERT INTO answers (question_id, answer_body, instant, answerer_name, answerer_email, reported, helpful)
+    VALUES (${req.params.question_id}, '${body}', '${instant}', '${req.body.name}', '${req.body.email}', false, 0)
+    RETURNING id;
+    `
+
+    client.query(queryStrAnswers)
+      .then((data, err) => {
+        let answer_id = data.rows[0].id
+        let queryStrAnswerPhotos = ``
+        req.body.photos.forEach((url) => {
+          queryStrAnswerPhotos += `INSERT INTO answer_photos (answer_id, url) VALUES (${answer_id}, '${url}');`
+
+        })
+
+        // then run query  on photos
+        client.query(queryStrAnswerPhotos)
+          .then((data) => {
+            res.status(201).send('Status: 201 CREATED')
+          })
+      })
+
+  },
+
+
+  helpful: function (req, res) {
+
+    if (req.params.answer_id === undefined) {
+      res.status(404).send('Must provide a "answer_id" parameter')
+    }
+
+    let queryStr =
+    `UPDATE answers SET helpful = helpful+1 WHERE id = ${req.params.answer_id};
+    `
+
+
+    client.query(queryStr)
+      .then((data) => {
+        res.status(201).send('Status: 201 UPDATED')
+      })
+      .catch((err) => {
+        console.log('helpful save error!')
+      })
+
+  },
+
+  report: function (req, res) {
+
+    if (req.params.answer_id === undefined) {
+      res.status(404).send('Must provide a "answer_id" parameter')
+    }
+
+    let queryStr =
+    `UPDATE answers SET reported = true WHERE id = ${req.params.answer_id};
+    `
+
+
+    client.query(queryStr)
+      .then((data) => {
+        res.status(201).send('Status: 201 UPDATED')
+      })
+      .catch((err) => {
+        console.log('helpful save error!')
+      })
+
   }
-  };
+};

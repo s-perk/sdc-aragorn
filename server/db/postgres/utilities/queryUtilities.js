@@ -27,13 +27,7 @@ const translateQuestion = (line) => {
 
   // Instant
   let instant = array[3]
-  instant = new Date(+instant).toString()
-  // if invalid date, just set equal to epoch
-  if (instant === 'Invalid Date') {
-    instant = 'Thu Jan 01 1970 00:00:00-240'
-  }
-  instant = instant.split(' GMT-')[0]
-  instant = instant + '-240'
+  instant = instantToString(instant)
 
   array[3] = `"${instant}"`
 
@@ -83,13 +77,7 @@ const translateAnswer = (line) => {
 
   // Instant
   let instant = array[3]
-  instant = new Date(+instant).toString()
-  // if invalid date, just set equal to epoch
-  if (instant === 'Invalid Date') {
-    instant = 'Thu Jan 01 1970 00:00:00-240'
-  }
-  instant = instant.split(' GMT-')[0]
-  instant = instant + '-240'
+  instant = instantToString(instant)
 
   array[3] = `"${instant}"`
 
@@ -150,6 +138,17 @@ const translateAnswerPhotos = (line) => {
   return queryLine
 }
 
+const instantToString = (instant) => {
+  let string = new Date(+instant).toString()
+  // if invalid date, just set equal to epoch
+  if (string === 'Invalid Date') {
+    string = 'Thu Jan 01 1970 00:00:00-240'
+  }
+  string = string.split(' GMT-')[0]
+  string = string + '-240'
+  return string
+}
 module.exports.translateQuestion = translateQuestion
 module.exports.translateAnswer = translateAnswer
 module.exports.translateAnswerPhotos = translateAnswerPhotos
+module.exports.instantToString = instantToString

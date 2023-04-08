@@ -13,7 +13,6 @@ CREATE TABLE questions (
   asker_email varchar(60) NOT NULL,
   reported boolean,
   helpful integer,
-  answers_index bigint[]
 );
 
 -- Create a products index

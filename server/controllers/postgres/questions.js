@@ -1,5 +1,5 @@
 const client = require('../../db/postgres/connection.js').client
-const controller = require('./index.js')
+const instantToString = require('../../db/postgres/utilities/queryUtilities.js').instantToString
 
 module.exports = {
 
@@ -58,20 +58,24 @@ module.exports = {
             }
           }
 
-          // Process Answers
-          if (row.answer_id !== prevAid) {
-            obj.answers[row.answer_id] = {
-              "id": +row.answer_id,
-              "body": row.answer_body,
-              "date": row.answer_instant,
-              "answerer_name": row.answerer_name,
-              "helpfulness": row.answer_helpful,
-              "photos": []
-            }
-          }
+          if (row.answer_id !== null) {
 
-          // Process Photos
-          obj.answers[row.answer_id].photos.push(row.url)
+            // Process Answers
+            if (row.answer_id !== prevAid) {
+              obj.answers[row.answer_id] = {
+                "id": +row.answer_id,
+                "body": row.answer_body,
+                "date": row.answer_instant,
+                "answerer_name": row.answerer_name,
+                "helpfulness": row.answer_helpful,
+                "photos": []
+              }
+            }
+
+            // Process Photos
+            obj.answers[row.answer_id].photos.push(row.url)
+
+          }
 
           // handle if only one result
           if (data.rows.length === 1) {
@@ -95,13 +99,65 @@ module.exports = {
 
 
   post: function (req, res) {
-    var params = [req.body.message, req.body.username, req.body.roomname];
-    models.questions.create(params, function(err, results) {
-      if (err) {
-        console.error('Unable to post questions to the database: ', err);
-        res.sendStatus(500);
+    if (req.body.product_id === undefined) {
+      res.status(404).send('Must provide a "product_id" parameter')
+    }
+
+    let body = req.body.body
+    body = body.replace("'", "''")
+
+    let instant = instantToString(Date.now())
+
+
+    let queryStr = `INSERT INTO questions (product_id, question_body, instant, asker_name, asker_email, reported, helpful)
+      VALUES (${req.body.product_id},'${body}','${instant}','${req.body.name}','${req.body.email}',false,0);
+    `
+    client.query(queryStr)
+      .then((data) => {
+        res.status(201).send('Status: 201 CREATED')
       }
-      res.sendStatus(201);
-    });
+    )
+
+  },
+
+  helpful: function (req, res) {
+
+    if (req.params.question_id === undefined) {
+      res.status(404).send('Must provide a "question_id" parameter')
+    }
+
+    let queryStr =
+    `UPDATE questions SET helpful = helpful+1 WHERE id = ${req.params.question_id};
+    `
+
+
+    client.query(queryStr)
+      .then((data) => {
+        res.status(201).send('Status: 201 UPDATED')
+      })
+      .catch((err) => {
+        console.log('helpful save error!')
+      })
+
+  },
+
+  report: function (req, res) {
+
+    if (req.params.question_id === undefined) {
+      res.status(404).send('Must provide a "question_id" parameter')
+    }
+
+    let queryStr =
+    `UPDATE questions SET reported = true WHERE id = ${req.params.question_id};
+    `
+
+    client.query(queryStr)
+      .then((data) => {
+        res.status(201).send('Status: 201 UPDATED')
+      })
+      .catch((err) => {
+        console.log('reported save error!')
+      })
+
   }
-  };
+};
