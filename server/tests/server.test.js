@@ -1,7 +1,7 @@
 const axios = require('axios')
 let data = {}
 
-describe('Questions', () => {
+describe('Questions GET route', () => {
 
   test('should return an object', async () => {
     await axios.get('http://localhost:3000/qa/questions', {
@@ -66,3 +66,35 @@ describe('Questions', () => {
 
 })
 
+
+describe('Questions POST route', () => {
+
+  test('should add a single question to the database', async () => {
+    await axios.post('http://localhost:3000/qa/questions', {
+      params: {
+        'product_id': 37325,
+        'count': 1000
+      }
+    }).then((res) => {
+      data = res.data
+    })
+    expect(typeof data).toBe('object')
+    expect(data.product_id).toBe('37325')
+    expect(data.results[0].question_id).toBe('3600000')
+  })
+
+
+  test('should return the correct product id and question id', async () => {
+    await axios.get('http://localhost:3000/qa/questions', {
+      params: {
+        'product_id': 37325,
+        'count': 1000
+      }
+    }).then((res) => {
+      data = res.data
+    })
+
+    expect(data.product_id).toBe('37325')
+    expect(data.results[0].question_id).toBe('3600000')
+  })
+})
