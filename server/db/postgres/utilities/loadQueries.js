@@ -105,6 +105,45 @@ const translateAnswer = (line) => {
 
   return queryLine
 }
+const addPhotosArrayOnAnswer = (line) => {
+
+   // Split into array to grab values
+   let array = line.split(',')
+
+   // If we have errant commas, do some extra processing
+   // without this, we will mess up number of columns
+   // I'm not performing this on everything to try and speed things up
+   if (array.length !== 3) {
+     array = csvToArray(line)
+   }
+
+   let id = array[0]
+   let question_id=array[1]
+   let url = array[2]
+
+  //  console.log('array', array)
+   /*
+   id BIGSERIAL NOT NULL PRIMARY KEY,
+   answer_id bigint NOT NULL,
+   "url" varchar(1000) NOT NULL,
+   */
+   // Paste it all back together
+   // Query parameters
+
+
+   let queryLine = `UPDATE answers SET photos = photos || ARRAY['{"id":"${id}", "url":${url}}'::jsonb] where question_id=${question_id};
+   `
+   // || operator adds values to end of array
+
+   // replace all single quotes with double-singles
+  //  queryLine = queryLine.replaceAll("'", "''")
+
+  //  // replace all double quotes with single quotes
+  //  queryLine = queryLine.replaceAll('"', "'",)
+  //  console.log(queryLine)
+
+   return queryLine
+}
 
 const translateAnswerPhotos = (line) => {
 
@@ -151,4 +190,5 @@ const instantToString = (instant) => {
 module.exports.translateQuestion = translateQuestion
 module.exports.translateAnswer = translateAnswer
 module.exports.translateAnswerPhotos = translateAnswerPhotos
+module.exports.addPhotosArrayOnAnswer = addPhotosArrayOnAnswer
 module.exports.instantToString = instantToString
