@@ -196,6 +196,54 @@ module.exports = {
 
   },
 
+  postWithPhotos: function (req, res) {
+    if (req.params.question_id === undefined) {
+      res.status(404).send('Must provide a "question_id" parameter')
+    }
+
+    let body = req.body.body
+    body = body.replace("'", "''")
+
+    let instant = instantToString(Date.now())
+
+
+    let queryStrAnswers =
+    `INSERT INTO answers (question_id, answer_body, instant, answerer_name, answerer_email, reported, helpful)
+    VALUES (${req.params.question_id}, '${body}', '${instant}', '${req.body.name}', '${req.body.email}', false, 0)
+    RETURNING id;
+    `
+
+    client.query(queryStrAnswers)
+      .then((data, err) => {
+        let answer_id = data.rows[0].id
+        let queryStrAnswerPhotos = ``
+        req.body.photos.forEach((url) => {
+          queryStrAnswerPhotos +=
+          `INSERT INTO answer_photos (answer_id, url) VALUES (${answer_id}, '${url}')
+          RETURNING id, url;`
+
+
+
+        })
+
+        // then run query  on photos
+        client.query(queryStrAnswerPhotos)
+          .then((data, err) => {
+
+            let queryStrAnswerPhotosUpdate = ''
+            req.body.photos.forEach((url) => {
+              queryStrAnswerPhotosUpdate +=
+              `UPDATE answers SET photos=photos || ARRAY['{"id":"${data.rows[0].id}", "url":"${url}"}'::jsonb] where question_id=${req.params.question_id};`
+            })
+
+            client.query(queryStrAnswerPhotosUpdate).then((data) => {
+              res.status(201).send('Status: 201 CREATED')
+            })
+          })
+      })
+
+  },
+
 
   helpful: function (req, res) {
 

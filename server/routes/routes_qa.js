@@ -86,7 +86,7 @@ router.post('/qa/questions', controller.questions.post)
 
 
 // ----- Answers -----
-router.post('/qa/questions/:question_id/answers', controller.answers.post)
+router.post('/qa/questions/:question_id/answers', controller.answers.postWithPhotos)
 
 
 // =====================================
