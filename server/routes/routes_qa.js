@@ -64,12 +64,12 @@ router.get('/products/:product_id', (req, res) => {
 // -------------------------------------
 
 // ----- Questions -----
-router.get('/qa/questions', controller.questions.get)
+router.get('/qa/questions', controller.questions.getWithPhotos)
 
 
 
 // ----- Answers -----
-router.get('/qa/questions/:question_id/answers', controller.answers.get)
+router.get('/qa/questions/:question_id/answers', controller.answers.getWithPhotos)
 
 // =====================================
 //                POST
@@ -86,7 +86,7 @@ router.post('/qa/questions', controller.questions.post)
 
 
 // ----- Answers -----
-router.post('/qa/questions/:question_id/answers', controller.answers.post)
+router.post('/qa/questions/:question_id/answers', controller.answers.postWithPhotos)
 
 
 // =====================================

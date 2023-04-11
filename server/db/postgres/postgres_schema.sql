@@ -51,6 +51,7 @@ CREATE TABLE answers (
   answerer_email varchar(60),
   reported boolean,
   helpful integer,
+  photos jsonb[]
 
   FOREIGN KEY (question_id) REFERENCES questions
 );
