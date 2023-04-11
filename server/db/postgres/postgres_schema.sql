@@ -18,6 +18,10 @@ CREATE TABLE questions (
 -- Create a products index
 CREATE INDEX idx_product_id ON questions(product_id);
 
+ALTER SEQUENCE questions_id_seq RESTART WITH 3600000;
+
+
+
 -- INSERT INTO questions (
 --   product_id,
 --   question_body,
@@ -59,6 +63,10 @@ CREATE TABLE answers (
 -- Create a questions index
 CREATE INDEX idx_question_id ON answers(question_id);
 
+ALTER SEQUENCE answers_id_seq RESTART WITH 6900000;
+
+
+
 
 -- INSERT INTO answers (
 --   id,
@@ -94,3 +102,5 @@ CREATE TABLE answer_photos (
 
 -- Create an answers index
 CREATE INDEX idx_answer_id ON answer_photos(answer_id);
+
+ALTER SEQUENCE answer_photos_id_seq RESTART WITH 2070000;
