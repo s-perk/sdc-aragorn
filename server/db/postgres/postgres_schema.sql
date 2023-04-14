@@ -1,6 +1,3 @@
-
-
-
 DROP TABLE questions CASCADE;
 -- cascade = delete all dependents as well (foreign keys, indexes)
 
@@ -12,11 +9,15 @@ CREATE TABLE questions (
   asker_name varchar(60) NOT NULL,
   asker_email varchar(60) NOT NULL,
   reported boolean,
-  helpful integer,
+  helpful integer
 );
 
 -- Create a products index
 CREATE INDEX idx_product_id ON questions(product_id);
+
+ALTER SEQUENCE questions_id_seq RESTART WITH 3600000;
+
+
 
 -- INSERT INTO questions (
 --   product_id,
@@ -51,13 +52,17 @@ CREATE TABLE answers (
   answerer_email varchar(60),
   reported boolean,
   helpful integer,
-  photos jsonb[]
+  photos jsonb[],
 
   FOREIGN KEY (question_id) REFERENCES questions
 );
 
 -- Create a questions index
 CREATE INDEX idx_question_id ON answers(question_id);
+
+ALTER SEQUENCE answers_id_seq RESTART WITH 6900000;
+
+
 
 
 -- INSERT INTO answers (
@@ -94,3 +99,5 @@ CREATE TABLE answer_photos (
 
 -- Create an answers index
 CREATE INDEX idx_answer_id ON answer_photos(answer_id);
+
+ALTER SEQUENCE answer_photos_id_seq RESTART WITH 2070000;

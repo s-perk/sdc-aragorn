@@ -181,7 +181,7 @@ module.exports = {
 
             // Process Photos
             if (row.photos !== null) {
-              console.log('photos', row.photos)
+              // console.log('photos', row.photos)
               row.photos.map((photo) => {
                 obj.answers[row.answer_id].photos.push(photo.url)
 
