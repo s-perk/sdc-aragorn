@@ -183,7 +183,7 @@ const instantToString = (instant) => {
   if (string === 'Invalid Date') {
     string = 'Thu Jan 01 1970 00:00:00-240'
   }
-  string = string.split(' GMT-')[0]
+  string = string.split(' GMT')[0]
   string = string + '-240'
   return string
 }

@@ -90,8 +90,6 @@ module.exports = {
 
   getWithPhotos: function (req, res) {
 
-    console.log('GET W/ PHOTOS')
-
     let question_id = req.params.question_id
     let page = req.options.params.page || 1
     let count = req.options.params.count || 5
